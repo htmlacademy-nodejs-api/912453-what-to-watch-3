@@ -1,0 +1,5 @@
+# Testing data
+
+GET http://localhost:1234/api HTTP/1.1
+
+###

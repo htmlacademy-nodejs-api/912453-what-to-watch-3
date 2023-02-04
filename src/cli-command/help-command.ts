@@ -16,6 +16,7 @@ export class HelpCommand implements CliCommandInterface {
         ${title('Команды:')}
             ${command('--version')}:                        #  Выводит номер версии приложения
             ${command('--help')}:                           #  Печатает этот текст
-            ${command('--import')} ${args('<filepath>')}:              #  Импортирует данные из TSV`));
+            ${command('--import')} ${args('<filepath>')}:              #  Импортирует данные из TSV
+            ${command('--generate')} ${args('<n> <filepath> <url>')}:  #  Генерирует произвольное количество тестовых данных`));
   }
 }
