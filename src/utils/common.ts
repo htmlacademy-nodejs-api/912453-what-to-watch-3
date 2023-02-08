@@ -8,11 +8,11 @@ export const createMovie = (row: string): Movie => {
   const [title, description, postDate, genres,
     releaseYear, rating, previewFilePath, movieFilePath,
     actors, director, durationInMinutes, commentCount,
-    userName, userEmail, userAvatar, userPassword,
+    userName, userEmail, userAvatar,
     posterFilePath, backgroundImageFilePath, backgroundColor] = tokens;
 
   return {
-    _id: crypto.randomUUID(),
+    // _id: crypto.randomUUID(),
     title,
     description,
     postDate: new Date(postDate),
@@ -26,14 +26,17 @@ export const createMovie = (row: string): Movie => {
     durationInMinutes: Number.parseInt(durationInMinutes, 10),
     commentsCount: Number.parseInt(commentCount, 10),
     user: {
-      _id: crypto.randomUUID(),
       name: userName,
       email: userEmail,
       avatar: userAvatar,
-      password: userPassword
     },
     posterFilePath,
     backgroundImageFilePath,
     backgroundColor
   };
+};
+
+export const createSHA256 = (line: string, salt: string): string => {
+  const shaHasher = crypto.createHmac('sha256', salt);
+  return shaHasher.update(line).digest('hex');
 };
