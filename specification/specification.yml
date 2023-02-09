@@ -1,0 +1,650 @@
+openapi: 3.0.0
+info:
+  title: API сервер для проекта «Что посмотреть».
+  description: |-
+    * Список ресурсов и маршрутов сервера «Что посмотреть».
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 2.0.0
+tags:
+  - name: users
+    description: Actions with users
+  - name: movies
+    description: Action with movies
+  - name: comments
+    description: Actions with comments
+paths:
+
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя.
+
+      requestBody:
+        description: Данные для создания нового пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createUser"
+        required: true
+
+      responses:
+        "201":
+          description: Пользователь зарегистрирован. Возвращает объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+
+        "400":
+          description: Ошибка валидации логина или пароля.
+
+        "409":
+          description: Пользователь с таким email уже существует.
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Авторизация пользователя
+      description: Авторизует пользователя по логину и паролю
+
+      requestBody:
+        description: Данные для авторизации.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/loginUser"
+        required: true
+
+      responses:
+        "200":
+          description: Пользователь авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/authorizedUser"
+
+        "400":
+          description: Неверный логин или пароль.
+
+        "404":
+          description: Пользователь с таким логином не существует
+
+    get:
+      tags:
+        - users
+      summary: Проверка состояния пользователя
+      description: Возвращает информацию по авторизованному пользователю
+
+      responses:
+        "200":
+          description: Пользователь авторизован. Возвращает объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+
+        "401":
+          description: Пользователь не авторизован.
+
+  /users/{userId}/avatar:
+    post:
+      tags:
+        - users
+      summary: Загрузить изображение аватара
+      description: Загружает изображение аватара пользователя. Изображение
+        аватара должно быть в формате `png` или `jpg`.
+
+      parameters:
+        - name: userId
+          in: path
+          description: Уникальный идентификатор пользователя
+          required: true
+          schema:
+            type: number
+            example: 1
+
+      responses:
+        "201":
+          description: Пользователь изменен. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/authorizedUser"
+
+        "400":
+          description: Некорректный формат изображения
+
+        "404":
+          description: Пользователь с таким логином не существует.
+
+
+
+
+  /movies:
+    post:
+      tags:
+        - movies
+      summary: Добавление нового фильма
+      description: Добавляет новый фильм
+
+      requestBody:
+        description: Данные для создания нового фильма
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createOrUpdateMovie"
+        required: true
+
+      responses:
+        "201":
+          description: Дабовлен новый фильм. Получен объект фильма.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movie"
+
+        "400":
+          description: Ошибка валидации.
+
+        "401":
+          description: Пользователь не авторизован.
+
+    get:
+      tags:
+        - movies
+      summary: Получение списка фильмов
+      description: Получает список фильмов
+
+      parameters:
+        - name: limit
+          in: query
+          description: Максимальное количество возвращаемых фильмов
+          schema:
+            type: number
+            example: 60
+
+      responses:
+        "200":
+          description: Возвращает массив фильмов.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movies"
+
+  /movies/genres/{genre}:
+    get:
+      tags:
+        - movies
+      summary: Получение списка фильмов определённого жанра
+      description: Получает список фильмов определённого жанра
+
+      parameters:
+        - name: genre
+          in: path
+          description: Определённый жанр фильмов
+          required: true
+          schema:
+            type: string
+            example: Drama
+
+        - name: limit
+          in: query
+          description: Максимальное количество возвращаемых фильмов (по умолчинию 60)
+          schema:
+            type: number
+            example: 100
+
+      responses:
+        "200":
+          description: Возвращает массив фильмов определённого жанра.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movies"
+
+        "404":
+          description: Такой жанр не существует
+
+  /movies/{movieId}:
+    patch:
+      tags:
+        - movies
+      summary: Редактирование фильма
+      description: Редактирует карточку фильма
+
+      parameters:
+        - name: movieId
+          in: path
+          description: Уникальный идентификатор фильма
+          required: true
+          schema:
+            type: number
+            example: 1
+
+      requestBody:
+        description: Информация для редактирования фильма
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createOrUpdateMovie"
+        required: true
+
+      responses:
+        "200":
+          description: Фильм изменён. Возвращает объект фильма.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movie"
+
+        "400":
+          description: Данные не валидны.
+
+        "401":
+          description: Пользователь не авторизован.
+
+        "403":
+          description: Недостаточно прав для редактирования фильма.
+
+        "404":
+          description: Такой фильм не существует
+
+    delete:
+      tags:
+        - movies
+      summary: Удаление карточки фильма.
+      description: Удаляет карточку фильма.
+
+      responses:
+        "204":
+          description: Фильм удалён.
+
+        "401":
+          description: Пользователь не авторизован.
+
+        "403":
+          description: Нет прав для удаления фильма.
+
+        "404":
+          description: Фильм не найден.
+
+    get:
+      tags:
+        - movies
+      summary: Получение информации о фильме.
+      description: Получает детальную информацию о фильме.
+
+      responses:
+        "200":
+          description: Возвращает объект с детальной информацей о фильме.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movie"
+
+        "404":
+          description: Фильм не найден.
+
+  /movies/promo:
+    get:
+      tags:
+        - movies
+      summary: Получение промо-фильма.
+      description: Получает промо-фильм.
+
+      responses:
+        "200":
+          description: Возвращает объект промо-фильма.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movie"
+
+  /movies/{movieId}/comments:
+    get:
+      tags:
+        - comments
+      summary: Получение списка комментариев для определенного фильма
+      description: Получает список комментариев для определенного фильма
+
+      parameters:
+        - name: movieId
+          in: path
+          description: ID фильма
+          required: true
+          schema:
+            type: number
+            example: 1
+
+      responses:
+        "200":
+          description: Возвращает массив комментариев
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/comments"
+
+        "404":
+          description: Фильм не найден.
+
+  /comments:
+    post:
+      tags:
+        - comments
+      summary: Добавление нового комментария к определённому фильму
+      description: Добавляет новый комментарий к определённому фильму
+
+      parameters:
+        - name: movieId
+          in: path
+          description: Уникальный идентификатор фильма
+          required: true
+          schema:
+            type: number
+            example: 1
+
+      requestBody:
+        description: Данные для создания нового комментария
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createComment"
+        required: true
+
+      responses:
+        "201":
+          description: Добавлен комментарий. Возвращает объект комментария.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/comment"
+
+        "400":
+          description: Данные не валидны.
+
+        "401":
+          description: Пользователь не авторизован.
+
+        "404":
+          description: Такой фильм не существует
+
+components:
+  schemas:
+    createOrUpdateMovie:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Список Шиндлера
+
+        description:
+          type: string
+          example: Фильм рассказывает реальную историю загадочного Оскара Шиндлера, члена нацистской партии, преуспевающего фабриканта, спасшего во время Второй мировой войны почти 1200 евреев.
+
+        genre:
+          type: string
+          example: drama
+
+        releaseYear:
+          type: number
+          example: 1993
+
+        previewFilePath:
+          type: string
+          example: /preview/schindlers_list.mp4
+
+        movieFilePath:
+          type: string
+          example: /schindlers_list.mp4
+
+        actors:
+          type: array
+          items:
+            type: string
+            example: Лиам Нисон
+
+        director:
+          type: string
+          example: Стивен Спилберг
+
+        durationInMinutes:
+          type: number
+          example: 195
+
+        posterFilePath:
+          type: string
+          example: /schindlers_list.jpg
+
+        backgroundImageFilePath:
+          type: string
+          example: /schindlers_list.jpg
+
+        backgroundColor:
+          type: string
+          example: "#AAAAAA"
+
+    movie:
+      type: object
+
+      properties:
+        title:
+          type: string
+          example: Список Шиндлера
+
+        description:
+          type: string
+          example: Фильм рассказывает реальную историю загадочного Оскара Шиндлера, члена нацистской партии, преуспевающего фабриканта, спасшего во время Второй мировой войны почти 1200 евреев.
+
+        postDate:
+          type: string
+          example: 2022-11-06T12:36:07.872Z
+
+        genre:
+          type: string
+          example: drama
+
+        releaseYear:
+          type: number
+          example: 1993
+
+        previewFilePath:
+          type: string
+          example: /preview/schindlers_list.mp4
+
+        movieFilePath:
+          type: string
+          example: /schindlers_list.mp4
+
+        actors:
+          type: array
+          items:
+            type: string
+            example: Лиам Нисон,Бен Кингсли, Рэйф Файнс
+
+        director:
+          type: string
+          example: Стивен Спилберг
+
+        durationInMinutes:
+          type: number
+          example: 195
+
+        commentsCount:
+          type: number
+          example: 12
+
+        userId:
+          type: string
+          example: 63e32d642fad37c5ba8c34f7
+
+        posterFilePath:
+          type: string
+          example: /schindlers_list.jpg
+
+        backgroundImageFilePath:
+          type: string
+          example: /schindlers_list.jpg
+
+        backgroundColor:
+          type: string
+          example: "#AAAAAA"
+
+    movies:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+            example: Список Шиндлера
+
+          postDate:
+            type: string
+            example: 2022-11-06T12:36:07.872Z
+
+          genre:
+            type: string
+            example: drama
+
+          previewFilePath:
+            type: string
+            example: /preview/schindlers_list.mp4
+
+          userId:
+            type: string
+            example: 63e32d642fad37c5ba8c34f7
+
+          posterFilePath:
+            type: string
+            example: /schindlers_list.jpg
+
+          commentsCount:
+            type: number
+            example: 12
+
+    comments:
+      type: array
+      items:
+        type: object
+        properties:
+          message:
+            type: string
+            example: Это лучший фильм!
+
+          rating:
+            type: number
+            example: 10
+
+          postDate:
+            type: string
+            format: date-time
+            example: 2022-11-06T12:36:07.872Z
+
+          userId:
+            type: string
+            example: 63e32d642fad37c5ba8c34f7
+
+    createComment:
+      type: object
+
+      properties:
+        message:
+          type: string
+          example: Это лучший фильм!
+
+        rating:
+          type: number
+          example: 10
+
+    comment:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Это лучший фильм!
+
+        rating:
+          type: number
+          example: 10
+
+        postDate:
+          type: string
+          format: date-time
+          example: 2022-11-06T12:36:07.872Z
+
+        userId:
+          type: string
+          example: 63e32d642fad37c5ba8c34f7
+
+    createUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: eva@mail.com
+        name:
+          type: string
+          example: Eva
+
+        password:
+          type: string
+          example: qwerty
+
+    loginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: eva@mail.com
+
+        password:
+          type: string
+          example: qwerty
+
+    user:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: 63e32d642fad37c5ba8c34f7
+
+        email:
+          type: string
+          example: eva@mail.com
+
+        name:
+          type: string
+          example: Eva
+
+        avatar:
+          type: string
+          example: avatar.png
+
+
+    authorizedUser:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 63e32d642fad37c5ba8c34f7
+
+        name:
+          type: string
+          example: Eva
+
+        email:
+          type: string
+          example: eva@mail.com
+
+        avatar:
+          type: string
+          example: avatar.png
+
+        token:
+          type: string
+          example: dfdfewfwefwefwefwe
