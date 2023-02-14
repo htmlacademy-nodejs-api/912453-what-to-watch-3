@@ -9,7 +9,7 @@ export interface CommentEntity extends defaultClasses.Base {}
     collection: 'comments'
   }
 })
-export class CommentEntity extends  defaultClasses.TimeStamps {
+export class CommentEntity extends defaultClasses.TimeStamps {
 
   @prop({
     required: true,
