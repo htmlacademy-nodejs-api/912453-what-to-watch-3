@@ -40,6 +40,12 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
 
   @prop({
     required: true,
+    default: []
+  })
+  public watchlist!: string[];
+
+  @prop({
+    required: true,
     default: ''
   })
   private password!: string; //Мин. длина 6 символов, макс. длина 12 символов.

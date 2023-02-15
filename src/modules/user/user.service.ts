@@ -5,6 +5,7 @@ import {CreateUserDto} from './dto/create-user.dto.js';
 import {inject, injectable} from 'inversify';
 import {Component} from '../../types/component.types.js';
 import {LoggerInterface} from '../../common/logger/logger.interface.js';
+import {UpdateUserDto} from './dto/update-user.dto.js';
 
 @injectable()
 export class UserService implements UserServiceInterface {
@@ -39,5 +40,29 @@ export class UserService implements UserServiceInterface {
     }
 
     return this.create(dto, salt);
+  }
+
+  public updateById(userId: string, dto: UpdateUserDto): Promise<DocumentType<UserEntity> | null> {
+    return this.userModel.findByIdAndUpdate(userId, dto, {new: true}).exec();
+  }
+
+  public async addMovieToWatchlist(userId: string, movieId: string): Promise<DocumentType<UserEntity> | null> {
+    const user = await this.findById(userId);
+    const watchlist = user?.watchlist ?? [];
+    if (!watchlist.includes(movieId)) {
+      return await this.userModel.findByIdAndUpdate(userId, {watchlist: [...watchlist, movieId]}, {new: true}).exec();
+    }
+    return user;
+  }
+
+  public async removeMovieFromWatchlist(userId: string, movieId: string): Promise<DocumentType<UserEntity> | null> {
+    const user = await this.findById(userId);
+    const watchlist = user?.watchlist ?? [];
+    const index = watchlist.indexOf(movieId);
+    if (index > -1) {
+      watchlist.splice(index, 1);
+      return await this.userModel.findByIdAndUpdate(userId, {watchlist}, {new: true}).exec();
+    }
+    return user;
   }
 }
