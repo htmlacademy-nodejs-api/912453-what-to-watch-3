@@ -1,0 +1,85 @@
+# Фильмы
+
+## Получить список фильмов
+GET http://localhost:1234/movies HTTP/1.1
+Content-Type: application/json
+
+###
+
+## Добавить новый фильм
+POST http://localhost:1234/movies HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Список Шиндлера",
+  "description": "Фильм рассказывает реальную историю загадочного Оскара Шиндлера, члена нацистской партии, преуспевающего фабриканта, спасшего во время Второй мировой войны почти 1200 евреев.",
+  "postDate": "2022-11-06T12:36:07.872Z",
+  "genre": "drama",
+  "releaseYear": 1993,
+  "previewFilePath": "https://preview/schindlers_list.mp4",
+  "movieFilePath": "https://schindlers_list.mp4",
+  "actors": [
+    "Лиам Нисон",
+    "Бен Кингсли",
+    "Рэйф Файнс"
+  ],
+  "director": "Стивен Спилберг",
+  "durationInMinutes": 132,
+  "userId": "63e32d642fad37c5ba8c34f7",
+  "posterFilePath": "https://poster.jpg",
+  "backgroundImageFilePath": "https://bg.jpg",
+  "backgroundColor": "#AAAAAA"
+}
+
+###
+
+## Получить список фильмов по жанру
+GET http://localhost:1234/movies/?genre=comedy HTTP/1.1
+Content-Type: application/json
+
+###
+
+## Получить список промо фильмов
+GET http://localhost:1234/movies/promo HTTP/1.1
+Content-Type: application/json
+
+###
+
+## Получить информацию о фильме
+GET http://localhost:1234/movies/63f52c55722722e9da05252d HTTP/1.1
+Content-Type: application/json
+
+###
+
+## Удалить фильм
+DELETE http://localhost:1234/movies/63f428fa18205c386b8e3c98 HTTP/1.1
+Content-Type: application/json
+
+###
+
+## Добавить новый фильм
+PATCH http://localhost:1234/movies/63f52c55722722e9da05252d HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Список Шиндлера 2",
+  "description": "Фильм рассказывает реальную историю загадочного Оскара Шиндлера, члена нацистской партии, преуспевающего фабриканта, спасшего во время Второй мировой войны почти 1200 евреев.",
+  "postDate": "2022-11-06T12:36:07.872Z",
+  "genre": "drama",
+  "releaseYear": 1993,
+  "previewFilePath": "https://preview/schindlers_list.mp4",
+  "movieFilePath": "https://schindlers_list.mp4",
+  "actors": [
+    "Лиам Нисон",
+    "Бен Кингсли",
+    "Рэйф Файнс"
+  ],
+  "director": "Стивен Спилберг",
+  "durationInMinutes": 132,
+  "userId": "63e32d642fad37c5ba8c34f7",
+  "posterFilePath": "https://poster.jpg",
+  "backgroundImageFilePath": "https://bg.jpg",
+  "backgroundColor": "#AAAAAA"
+}
+
+###

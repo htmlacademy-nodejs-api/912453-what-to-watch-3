@@ -8,9 +8,11 @@ import {CreateMovieDto} from './dto/create-movie.dto.js';
 import {UpdateMovieDto} from './dto/update-movie.dto.js';
 import {SortType} from '../../types/sort-type.enum.js';
 import {CommentServiceInterface} from '../comment/comment-service.interface.js';
+import {CommentEntity} from '../comment/comment.entity.js';
 
 const DEFAULT = {
-  MOVIES_COUNT: 60
+  MOVIES_COUNT: 60,
+  RATING_ACCURACY: 1
 };
 
 @injectable()
@@ -27,17 +29,17 @@ export class MovieService implements MovieServiceInterface {
     return result;
   }
 
-  public async findByMovieId(movieId: string): Promise<DocumentType<MovieEntity> | null> {
+  public async findByMovieId(_id: string): Promise<DocumentType<MovieEntity> | null> {
     return this.movieModel
-      .findOne({movieId})
+      .findOne({_id})
       .populate(['userId'])
       .exec();
   }
 
-  public async find(count: number = DEFAULT.MOVIES_COUNT): Promise<DocumentType<MovieEntity>[]> {
+  public async find(count?: number): Promise<DocumentType<MovieEntity>[]> {
     return this.movieModel
       .find()
-      .limit(count)
+      .limit(count ?? DEFAULT.MOVIES_COUNT)
       .populate(['userId'])
       .exec();
   }
@@ -64,21 +66,21 @@ export class MovieService implements MovieServiceInterface {
     return this.movieModel.find({userId}).exec(); // Это заглушка пока не реализую логику на пользователе
   }
 
-  public async findByMovieGenre(genre: string, count: number = DEFAULT.MOVIES_COUNT): Promise<DocumentType<MovieEntity>[]> {
+  public async findByMovieGenre(genre: string, count?: number): Promise<DocumentType<MovieEntity>[]> {
     return this.movieModel
       .find({'genre': genre})
       .populate('userId')
       .sort({'postDate': SortType.Down})
-      .limit(count)
+      .limit(count ?? DEFAULT.MOVIES_COUNT)
       .exec();
   }
 
-  public async findPromo(count: number = DEFAULT.MOVIES_COUNT): Promise<DocumentType<MovieEntity>[]> {
+  public async findPromo(count?: number): Promise<DocumentType<MovieEntity>[]> {
     return this.movieModel
       .find({'isPromo' : true})
       .populate('userId')
       .sort({'postDate': SortType.Down})
-      .limit(count)
+      .limit(count ?? DEFAULT.MOVIES_COUNT)
       .exec();
   }
 
@@ -93,12 +95,9 @@ export class MovieService implements MovieServiceInterface {
 
   public async calcAndUpdateRating(movieId: string): Promise<DocumentType<MovieEntity> | null> {
     const comments = await this.commentService.findByMovieId(movieId);
-    const ratings = comments.map((comment) => comment.rating).reduce((summ, next) => {
-      console.log('calc rating = ', next);
-      return summ + next;
-    });
-    console.log(ratings);
-    const rating = ratings / comments.length;
+    const ratings = comments.map((comment: DocumentType<CommentEntity>) => comment.rating)
+      .reduce((summ: number, next: number) => summ + next);
+    const rating = Number((ratings / comments.length).toFixed(DEFAULT.RATING_ACCURACY));
     return this.updateById(movieId, {rating});
   }
 }

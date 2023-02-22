@@ -91,7 +91,7 @@ paths:
         "401":
           description: Пользователь не авторизован.
 
-  /users/{userId}/avatar:
+  /users/avatar/{userId}:
     post:
       tags:
         - users
@@ -161,7 +161,7 @@ paths:
       description: Получает список фильмов
 
       parameters:
-        - name: limit
+        - name: count
           in: query
           description: Максимальное количество возвращаемых фильмов
           schema:
@@ -176,7 +176,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/movies"
 
-  /movies/genres/{genre}:
+  /movies/{genre}:
     get:
       tags:
         - movies
@@ -192,7 +192,7 @@ paths:
             type: string
             example: Drama
 
-        - name: limit
+        - name: count
           in: query
           description: Максимальное количество возвращаемых фильмов (по умолчинию 60)
           schema:
@@ -305,7 +305,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/movie"
 
-  /movies/{movieId}/comments:
+  /comments/{movieId}:
     get:
       tags:
         - comments
