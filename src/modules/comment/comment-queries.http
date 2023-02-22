@@ -1,0 +1,20 @@
+# Комментарии
+
+## Добавление нового комментария - WIP!!!
+POST http://localhost:1234/comments HTTP/1.1
+Content-Type: application/json
+
+{
+  "message": "Hello world! Test comment 7",
+  "rating": 4,
+  "userId": "63f52b2533784a680f930ba3",
+  "movieId": "63f52c55722722e9da05252d"
+}
+
+###
+
+## Получение комментариев к фильму - WIP!!!
+GET http://localhost:1234/comments/63f52c55722722e9da05252d HTTP/1.1
+Content-Type: application/json
+
+###

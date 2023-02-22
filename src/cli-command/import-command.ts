@@ -13,6 +13,11 @@ import {UserModel} from '../modules/user/user.entity.js';
 import {ConsoleLoggerService} from '../common/logger/console-logger.service.js';
 import {Movie} from '../types/movie.type.js';
 import {getURI} from '../utils/db.js';
+import {CommentModel} from '../modules/comment/comment.entity.js';
+// import {inject} from 'inversify';
+// import {Component} from '../types/component.types.js';
+// import {CommentServiceInterface} from '../modules/comment/comment-service.interface.js';
+import {CommentService} from '../modules/comment/comment.service.js';
 
 const DEFAULT_DB_PORT = 27017;
 const DEFAULT_USER_PASSWORD = '123456';
@@ -30,7 +35,7 @@ export class ImportCommand implements CliCommandInterface {
     this.onComplete = this.onComplete.bind(this);
 
     this.logger = new ConsoleLoggerService();
-    this.movieService = new MovieService(this.logger, MovieModel);
+    this.movieService = new MovieService(this.logger, MovieModel, new CommentService(this.logger, CommentModel));
     this.userService = new UserService(this.logger, UserModel);
     this.databaseService = new DatabaseService(this.logger);
   }
@@ -41,7 +46,6 @@ export class ImportCommand implements CliCommandInterface {
       password: DEFAULT_USER_PASSWORD
     }, this.salt);
 
-    console.log(user);
     await this.movieService.create({
       ...movie,
       userId: user.id,

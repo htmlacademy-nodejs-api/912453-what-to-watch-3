@@ -8,8 +8,8 @@ export interface MovieServiceInterface {
   findByMovieId(id: string): Promise<DocumentType<MovieEntity> | null>;
   find(): Promise<DocumentType<MovieEntity>[]>;
   findByMovieTitle(title: string): Promise<DocumentType<MovieEntity> | null>;
-  findByMovieGenre(genre: string, count: number): Promise<DocumentType<MovieEntity>[]>;
-  findPromo(count: number): Promise<DocumentType<MovieEntity>[]>;
+  findByMovieGenre(genre: string, count?: number): Promise<DocumentType<MovieEntity>[]>;
+  findPromo(count?: number): Promise<DocumentType<MovieEntity>[]>;
   getWatchlistByUserId(userId: string): Promise<DocumentType<MovieEntity>[]>;
   updateById(movieId: string, dto: UpdateMovieDto): Promise<DocumentType<MovieEntity> | null>;
   deleteById(movieId: string): Promise<DocumentType<MovieEntity> | null>;
