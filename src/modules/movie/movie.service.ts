@@ -95,9 +95,8 @@ export class MovieService implements MovieServiceInterface {
 
   public async calcAndUpdateRating(movieId: string): Promise<DocumentType<MovieEntity> | null> {
     const comments = await this.commentService.findByMovieId(movieId);
-    const ratings = comments.map((comment: DocumentType<CommentEntity>) => comment.rating).reduce((summ: number, next: number) => {
-      return summ + next;
-    });
+    const ratings = comments.map((comment: DocumentType<CommentEntity>) => comment.rating)
+      .reduce((summ: number, next: number) => summ + next);
     const rating = Number((ratings / comments.length).toFixed(DEFAULT.RATING_ACCURACY));
     return this.updateById(movieId, {rating});
   }
