@@ -14,9 +14,6 @@ import {ConsoleLoggerService} from '../common/logger/console-logger.service.js';
 import {Movie} from '../types/movie.type.js';
 import {getURI} from '../utils/db.js';
 import {CommentModel} from '../modules/comment/comment.entity.js';
-// import {inject} from 'inversify';
-// import {Component} from '../types/component.types.js';
-// import {CommentServiceInterface} from '../modules/comment/comment-service.interface.js';
 import {CommentService} from '../modules/comment/comment.service.js';
 
 const DEFAULT_DB_PORT = 27017;

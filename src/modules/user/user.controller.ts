@@ -8,10 +8,16 @@ import {UserServiceInterface} from './user-service.interface.js';
 import {ConfigInterface} from '../../common/config/config.interface.js';
 import {HttpError} from '../../common/errors/http-error.js';
 import {StatusCodes} from 'http-status-codes';
-import {fillDTO} from '../../utils/common.js';
+import {createJWT, fillDTO} from '../../utils/common.js';
 import {UserResponse} from './response/user.response.js';
 import {CreateUserDto} from './dto/create-user.dto.js';
 import {LoginUserDto} from './dto/login-user.dto.js';
+import {ValidateObjectMiddleware} from '../../common/middlewares/validate-object.middleware.js';
+import {ValidateDtoMiddleware} from '../../common/middlewares/validate-dto.middleware.js';
+import {UploadFileMiddleware} from '../../common/middlewares/upload-file.middleware.js';
+import {JWT_ALGORITM} from './user-const.js';
+import LoggedUserResponse from './response/logged-user.response.js';
+import {PrivateRouteMiddleware} from '../../common/middlewares/private-route.middleware.js';
 
 @injectable()
 export class UserController extends Controller {
@@ -24,13 +30,36 @@ export class UserController extends Controller {
 
     this.logger.info('Register routes for UserController…');
 
-    this.addRoute({path: '/register', method: HttpMethod.Post, handler: this.register});
-    this.addRoute({path: '/login', method: HttpMethod.Post, handler: this.login});
-    this.addRoute({path: '/login', method: HttpMethod.Get, handler: this.getStatus});
-    this.addRoute({path: '/avatar/:userId', method: HttpMethod.Post, handler: this.uploadAvatar});
+    this.addRoute({
+      path: '/register',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateDtoMiddleware(CreateUserDto)]
+    });
+    this.addRoute({
+      path: '/login',
+      method: HttpMethod.Post,
+      handler: this.login,
+      middlewares: [new ValidateDtoMiddleware(LoginUserDto)]
+    });
+    this.addRoute({
+      path: '/login',
+      method: HttpMethod.Get,
+      handler: this.checkAuthenticate
+    });
+    this.addRoute({
+      path: '/avatar/:userId',
+      method: HttpMethod.Post,
+      handler: this.uploadAvatar,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateObjectMiddleware('userId'),
+        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'avatar')
+      ]
+    });
   }
 
-  public async register(
+  public async create(
     {body}: Request<Record<string, unknown>, Record<string, unknown>, CreateUserDto>,
     res: Response,
   ): Promise<void> {
@@ -50,39 +79,40 @@ export class UserController extends Controller {
 
   public async login(
     {body}: Request<Record<string, unknown>, Record<string, unknown>, LoginUserDto>,
-    _res: Response,
+    res: Response,
   ): Promise<void> {
-    const existsUser = await this.userService.findByEmail(body.email);
-
-    if (!existsUser) {
+    const user = await this.userService.verifyUser(body, this.configService.get('SALT'));
+    if (!user) {
       throw new HttpError(
         StatusCodes.UNAUTHORIZED,
-        `User with email ${body.email} not found.`,
+        'Unauthorized',
         'UserController',
       );
     }
 
-    throw new HttpError(
-      StatusCodes.NOT_IMPLEMENTED,
-      'Not implemented',
-      'UserController - trying to login',
+    const token = await createJWT(
+      JWT_ALGORITM,
+      this.configService.get('JWT_SECRET'),
+      { email: user.email, id: user.id}
     );
+    this.ok(res, fillDTO(LoggedUserResponse, {email: user.email, token}));
   }
 
-  public async getStatus(_req: Request, _res: Response): Promise<void> {
-    throw new HttpError(
-      StatusCodes.NOT_IMPLEMENTED,
-      'Not implemented',
-      'UserController - user trying to check auth status',
-    );
+  public async checkAuthenticate(req: Request, res: Response): Promise<void> {
+    if (! req.user) {
+      throw new HttpError(
+        StatusCodes.UNAUTHORIZED,
+        'Unauthorized',
+        'UserController'
+      );
+    }
+    const user = await this.userService.findByEmail(req.user.email);
+    this.ok(res, fillDTO(LoggedUserResponse, user));
   }
 
-  public async uploadAvatar(req: Request, _res: Response): Promise<void> {
-    const {userId} = req.params;
-    throw new HttpError(
-      StatusCodes.NOT_IMPLEMENTED,
-      'Not implemented',
-      `UserController - trying to upload avatar to user(id:${userId})`,
-    );
+
+  public async uploadAvatar(req: Request, res: Response): Promise<void> {
+    const userWithAvatar = await this.userService.updateById(req.params.userId, {avatar: req.file?.path});
+    this.ok(res, fillDTO(UserResponse, userWithAvatar));
   }
 }

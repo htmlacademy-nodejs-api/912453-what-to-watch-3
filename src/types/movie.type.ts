@@ -2,7 +2,6 @@ import {Genre} from './genre.enum.js';
 import {User} from './user.type.js';
 
 export type Movie = {
-  // _id: string;
   title: string;
   description: string;
   postDate: Date;

@@ -1,7 +1,7 @@
 # Фильмы
 
 ## Получить список фильмов
-GET http://localhost:1234/movies HTTP/1.1
+GET http://localhost:1234/movies/?count=2 HTTP/1.1
 Content-Type: application/json
 
 ###
@@ -9,9 +9,10 @@ Content-Type: application/json
 ## Добавить новый фильм
 POST http://localhost:1234/movies HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRpbWFAdGVzdDIucnUiLCJpZCI6IjYzZmJhMzBlY2Q1YjhhMWY2YTk0N2QzMCIsImlhdCI6MTY3NzQzNTY3NywiZXhwIjoxNjc3NjA4NDc3fQ.yEVmqe08wsX5bYdNFJ-Fa1kO4dor9bA6PIwrtCg2lmk
 
 {
-  "title": "Список Шиндлера",
+  "title": "Список Шиндлера - test 6",
   "description": "Фильм рассказывает реальную историю загадочного Оскара Шиндлера, члена нацистской партии, преуспевающего фабриканта, спасшего во время Второй мировой войны почти 1200 евреев.",
   "postDate": "2022-11-06T12:36:07.872Z",
   "genre": "drama",
@@ -25,7 +26,7 @@ Content-Type: application/json
   ],
   "director": "Стивен Спилберг",
   "durationInMinutes": 132,
-  "userId": "63e32d642fad37c5ba8c34f7",
+  "userId": "63f428f918205c386b8e3c58",
   "posterFilePath": "https://poster.jpg",
   "backgroundImageFilePath": "https://bg.jpg",
   "backgroundColor": "#AAAAAA"
@@ -40,29 +41,31 @@ Content-Type: application/json
 ###
 
 ## Получить список промо фильмов
-GET http://localhost:1234/movies/promo HTTP/1.1
+GET http://localhost:1234/movies/lists/promo HTTP/1.1
 Content-Type: application/json
 
 ###
 
 ## Получить информацию о фильме
-GET http://localhost:1234/movies/63f52c55722722e9da05252d HTTP/1.1
+GET http://localhost:1234/movies/63fa1a4b04734d999e97ddbd HTTP/1.1
 Content-Type: application/json
 
 ###
 
 ## Удалить фильм
-DELETE http://localhost:1234/movies/63f428fa18205c386b8e3c98 HTTP/1.1
+DELETE http://localhost:1234/movies/63fa1a4b04734d999e97ddbd HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRpbWFAdGVzdDIucnUiLCJpZCI6IjYzZmJhMzBlY2Q1YjhhMWY2YTk0N2QzMCIsImlhdCI6MTY3NzQzNTY3NywiZXhwIjoxNjc3NjA4NDc3fQ.yEVmqe08wsX5bYdNFJ-Fa1kO4dor9bA6PIwrtCg2lmk
 
 ###
 
-## Добавить новый фильм
-PATCH http://localhost:1234/movies/63f52c55722722e9da05252d HTTP/1.1
+## Изменить данные фильма
+PATCH http://localhost:1234/movies/63fa72d262831b8d8af894d2 HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRpbWFAdGVzdDIucnUiLCJpZCI6IjYzZmJhMzBlY2Q1YjhhMWY2YTk0N2QzMCIsImlhdCI6MTY3NzQzNTY3NywiZXhwIjoxNjc3NjA4NDc3fQ.yEVmqe08wsX5bYdNFJ-Fa1kO4dor9bA6PIwrtCg2lmk
 
 {
-  "title": "Список Шиндлера 2",
+  "title": "Список Шиндлера - update 7",
   "description": "Фильм рассказывает реальную историю загадочного Оскара Шиндлера, члена нацистской партии, преуспевающего фабриканта, спасшего во время Второй мировой войны почти 1200 евреев.",
   "postDate": "2022-11-06T12:36:07.872Z",
   "genre": "drama",
@@ -76,10 +79,37 @@ Content-Type: application/json
   ],
   "director": "Стивен Спилберг",
   "durationInMinutes": 132,
-  "userId": "63e32d642fad37c5ba8c34f7",
+  "userId": "63e32d642fad37c5ba8c34f8",
   "posterFilePath": "https://poster.jpg",
   "backgroundImageFilePath": "https://bg.jpg",
-  "backgroundColor": "#AAAAAA"
+  "backgroundColor": "#9A9A9A",
+  "isPromo": true
 }
 
 ###
+
+## Добавить 1 фильм в список "К просмотру"
+POST http://localhost:1234/movies/watchlist/63fa72d262831b8d8af894d2/true HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRpbWFAdGVzdDIucnUiLCJpZCI6IjYzZmJhMzBlY2Q1YjhhMWY2YTk0N2QzMCIsImlhdCI6MTY3NzQzNTY3NywiZXhwIjoxNjc3NjA4NDc3fQ.yEVmqe08wsX5bYdNFJ-Fa1kO4dor9bA6PIwrtCg2lmk
+
+###
+
+## Добавить 2 фильм в список "К просмотру"
+POST http://localhost:1234/movies/watchlist/63f428f918205c386b8e3c55/true HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRpbWFAdGVzdDIucnUiLCJpZCI6IjYzZmJhMzBlY2Q1YjhhMWY2YTk0N2QzMCIsImlhdCI6MTY3NzQzNTY3NywiZXhwIjoxNjc3NjA4NDc3fQ.yEVmqe08wsX5bYdNFJ-Fa1kO4dor9bA6PIwrtCg2lmk
+
+###
+
+## Удилаить 1 фильм из списка "К просмотру"
+POST http://localhost:1234/movies/watchlist/63fa72d262831b8d8af894d2/false HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRpbWFAdGVzdDIucnUiLCJpZCI6IjYzZmJhMzBlY2Q1YjhhMWY2YTk0N2QzMCIsImlhdCI6MTY3NzQzNTY3NywiZXhwIjoxNjc3NjA4NDc3fQ.yEVmqe08wsX5bYdNFJ-Fa1kO4dor9bA6PIwrtCg2lmk
+
+###
+
+## Удилаить 2 фильм из списка "К просмотру"
+POST http://localhost:1234/movies/watchlist/63f428f918205c386b8e3c55/false HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRpbWFAdGVzdDIucnUiLCJpZCI6IjYzZmJhMzBlY2Q1YjhhMWY2YTk0N2QzMCIsImlhdCI6MTY3NzQzNTY3NywiZXhwIjoxNjc3NjA4NDc3fQ.yEVmqe08wsX5bYdNFJ-Fa1kO4dor9bA6PIwrtCg2lmk

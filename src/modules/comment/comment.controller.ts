@@ -10,25 +10,44 @@ import {HttpError} from '../../common/errors/http-error.js';
 import {StatusCodes} from 'http-status-codes';
 import {CommentResponse} from './response/comment.response.js';
 import {fillDTO} from '../../utils/common.js';
+import {ValidateObjectMiddleware} from '../../common/middlewares/validate-object.middleware.js';
+import {ValidateDtoMiddleware} from '../../common/middlewares/validate-dto.middleware.js';
+import {CreateCommentDto} from './dto/create-comment.dto.js';
+import {PrivateRouteMiddleware} from '../../common/middlewares/private-route.middleware.js';
 
 @injectable()
 export class CommentController extends Controller {
   constructor(
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.CommentServiceInterface) private commentService: CommentServiceInterface,
-    @inject(Component.MovieServiceInterface) private movieServise: MovieServiceInterface
+    @inject(Component.MovieServiceInterface) private movieService: MovieServiceInterface
   ) {
     super(logger);
 
     this.logger.info('Register routes for CommentController…');
 
-    this.addRoute({path: '/', method: HttpMethod.Post, handler: this.createComment});
-    this.addRoute({path: '/:movieId', method: HttpMethod.Get, handler: this.getMovieComments});
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(CreateCommentDto)
+      ]
+    });
+    this.addRoute({
+      path: '/:movieId',
+      method: HttpMethod.Get,
+      handler: this.index,
+      middlewares: [
+        new ValidateObjectMiddleware('movieId')
+      ]
+    });
   }
 
-  public async createComment(req: Request, res: Response): Promise<void> {
+  public async create(req: Request, res: Response): Promise<void> {
     const { body } = req;
-    const movie = await this.movieServise.findByMovieId(body.movieId);
+    const movie = await this.movieService.findByMovieId(body.movieId);
     if (!movie) {
       throw new HttpError(
         StatusCodes.NOT_FOUND,
@@ -37,18 +56,18 @@ export class CommentController extends Controller {
       );
     }
 
-    const comment = await this.commentService.create(body);
-    await this.movieServise.incCommentCount(body.movieId);
-    await this.movieServise.calcAndUpdateRating(body.movieId);
+    const comment = await this.commentService.create({...body, userId: req.user.id});
+    await this.movieService.incCommentCount(body.movieId);
+    await this.movieService.calcAndUpdateRating(body.movieId);
     console.log(comment);
     this.created(res, fillDTO(CommentResponse, comment));
 
     this.logger.warn('Comment created in testing mode, handler is not implemented yet!');
   }
 
-  public async getMovieComments(req: Request, res: Response): Promise<void> {
+  public async index(req: Request, res: Response): Promise<void> {
     const {movieId} = req.params;
-    const movie = this.movieServise.findByMovieId(movieId);
+    const movie = this.movieService.findByMovieId(movieId);
     if(!movie) {
       throw new HttpError(
         StatusCodes.NOT_FOUND,

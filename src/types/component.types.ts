@@ -13,4 +13,6 @@ export const Component = {
   MovieController: Symbol.for('MovieController'),
   CommentController: Symbol.for('CommentController'),
   ExceptionFilterInterface: Symbol.for('ExceptionFilterInterface'),
+  WatchlistServiceInterface: Symbol.for('WatchlistServiceInterface'),
+  WatchlistModel: Symbol.for('WatchlistModel')
 } as const;

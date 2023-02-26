@@ -1,15 +1,12 @@
 import {Expose, Type} from 'class-transformer';
 import {UserResponse} from '../../user/response/user.response.js';
 
-export class MovieResponse {
+export class MovieShortResponse {
   @Expose()
   public id!: string;
 
   @Expose()
   public title!: string;
-
-  @Expose()
-  public description!: string;
 
   @Expose()
   public postDate!: string;
@@ -18,25 +15,7 @@ export class MovieResponse {
   public genre!: string;
 
   @Expose()
-  public releaseYear!: number;
-
-  @Expose()
-  public rating!: number;
-
-  @Expose()
   public previewFilePath!: string;
-
-  @Expose()
-  public movieFilePath!: string;
-
-  @Expose()
-  public actors!: string[];
-
-  @Expose()
-  public director!: string;
-
-  @Expose()
-  public durationInMinutes!: number;
 
   @Expose()
   public commentsCount!: number;
@@ -47,10 +26,4 @@ export class MovieResponse {
 
   @Expose()
   public posterFilePath!: string;
-
-  @Expose()
-  public backgroundImageFilePath!: string;
-
-  @Expose()
-  public backgroundColor!: string;
 }
