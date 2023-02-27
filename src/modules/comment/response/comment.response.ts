@@ -1,4 +1,5 @@
-import {Expose} from 'class-transformer';
+import {Expose, Type} from 'class-transformer';
+import {UserResponse} from '../../user/response/user.response.js';
 
 export class CommentResponse {
   @Expose()
@@ -7,12 +8,13 @@ export class CommentResponse {
   @Expose()
   public message!: string;
 
-  @Expose({ name: 'postedAt'})
+  @Expose()
   public postDate!: string;
 
   @Expose()
   public rating!: number;
 
-  @Expose()
-  public userId!: string;
+  @Expose({ name: 'userId'})
+  @Type(() => UserResponse)
+  public user!: UserResponse;
 }

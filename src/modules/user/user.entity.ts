@@ -19,30 +19,20 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   }
 
   @prop({
-    minlength: 1,
-    maxlength: 15,
     required: true,
   })
   public name!: string; //Мин. длина 1 символ, макс. длина 15 символов.
 
   @prop({
     unique: true,
-    match: [/^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Email is incorrect'],
     required: true,
   })
   public email!: string; //Валидный адрес электронной почты.
 
   @prop({
-    required: true,
-    default: 'no-avatar.png'
+    default: 'no-avatar.png' // Пользователю без аватара назначается изображение по умолчанию
   })
-  public avatar!: string; //Изображение пользователя в формате .jpg или .png.
-
-  @prop({
-    required: true,
-    default: []
-  })
-  public watchlist!: string[];
+  public avatar?: string; //Изображение пользователя в формате .jpg или .png.
 
   @prop({
     required: true,
@@ -56,6 +46,11 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
 
   public getPassword() {
     return this.password;
+  }
+
+  public verifyPassword(password: string, salt: string) {
+    const hashPassword = createSHA256(password, salt);
+    return hashPassword === this.password;
   }
 }
 

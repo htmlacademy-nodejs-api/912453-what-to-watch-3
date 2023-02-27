@@ -9,11 +9,8 @@ import {UpdateMovieDto} from './dto/update-movie.dto.js';
 import {SortType} from '../../types/sort-type.enum.js';
 import {CommentServiceInterface} from '../comment/comment-service.interface.js';
 import {CommentEntity} from '../comment/comment.entity.js';
-
-const DEFAULT = {
-  MOVIES_COUNT: 60,
-  RATING_ACCURACY: 1
-};
+import {DEFAULT} from './movie-const.js';
+import {UpdateRatingDto} from './dto/update-rating.dto.js';
 
 @injectable()
 export class MovieService implements MovieServiceInterface {
@@ -22,6 +19,10 @@ export class MovieService implements MovieServiceInterface {
     @inject(Component.MovieModel) private readonly movieModel: types.ModelType<MovieEntity>,
     @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface
   ){}
+
+  public async exists(movieId: string): Promise<boolean> {
+    return (await this.movieModel.exists({_id: movieId})) !== null;
+  }
 
   public async create(dto: CreateMovieDto): Promise<DocumentType<MovieEntity>> {
     const result = await this.movieModel.create(dto);
@@ -36,15 +37,16 @@ export class MovieService implements MovieServiceInterface {
       .exec();
   }
 
-  public async find(count?: number): Promise<DocumentType<MovieEntity>[]> {
+  public async find(count: number): Promise<DocumentType<MovieEntity>[]> {
     return this.movieModel
       .find()
+      .sort({'postDate': SortType.Down})
       .limit(count ?? DEFAULT.MOVIES_COUNT)
       .populate(['userId'])
       .exec();
   }
 
-  public async updateById(movieId: string, dto: UpdateMovieDto): Promise<DocumentType<MovieEntity> | null> {
+  public async updateById(movieId: string, dto: UpdateMovieDto | UpdateRatingDto): Promise<DocumentType<MovieEntity> | null> {
     return this.movieModel
       .findByIdAndUpdate(movieId, dto, {new: true})
       .populate(['userId'])
@@ -62,25 +64,20 @@ export class MovieService implements MovieServiceInterface {
       .exec();
   }
 
-  public async getWatchlistByUserId(userId: string): Promise<DocumentType<MovieEntity>[]> {
-    return this.movieModel.find({userId}).exec(); // Это заглушка пока не реализую логику на пользователе
-  }
-
   public async findByMovieGenre(genre: string, count?: number): Promise<DocumentType<MovieEntity>[]> {
     return this.movieModel
       .find({'genre': genre})
-      .populate('userId')
       .sort({'postDate': SortType.Down})
       .limit(count ?? DEFAULT.MOVIES_COUNT)
+      .populate('userId')
       .exec();
   }
 
-  public async findPromo(count?: number): Promise<DocumentType<MovieEntity>[]> {
+  public async findPromo(): Promise<DocumentType<MovieEntity>[]> {
     return this.movieModel
       .find({'isPromo' : true})
-      .populate('userId')
       .sort({'postDate': SortType.Down})
-      .limit(count ?? DEFAULT.MOVIES_COUNT)
+      .populate(['userId'])
       .exec();
   }
 

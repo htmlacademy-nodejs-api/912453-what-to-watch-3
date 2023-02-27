@@ -3,11 +3,11 @@
 ## Добавление нового комментария - WIP!!!
 POST http://localhost:1234/comments HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRpbWFAdGVzdDIucnUiLCJpZCI6IjYzZmJhMzBlY2Q1YjhhMWY2YTk0N2QzMCIsImlhdCI6MTY3NzQzNTY3NywiZXhwIjoxNjc3NjA4NDc3fQ.yEVmqe08wsX5bYdNFJ-Fa1kO4dor9bA6PIwrtCg2lmk
 
 {
-  "message": "Hello world! Test comment 7",
-  "rating": 4,
-  "userId": "63f52b2533784a680f930ba3",
+  "message": "Hello world! Test comment 8",
+  "rating": 6,
   "movieId": "63f52c55722722e9da05252d"
 }
 
